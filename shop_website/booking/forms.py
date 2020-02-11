@@ -8,14 +8,14 @@ class DateInput(forms.DateInput):
 class BookingForm(forms.ModelForm):
      class Meta:
          model = Booking
-         fields = ['bill_no','mobile', 'address', 'billing_date', 'delivery_date','discount','final_amount']
+         fields = ['bill_no','mobile', 'address', 'billing_date', 'delivery_date','discount','final_amount','delivered','message']
          widgets = {
         'bill_no': forms.Textarea(attrs={'rows':1}),
           'mobile': forms.Textarea(attrs={'rows':1}),
           'address': forms.Textarea(attrs={'rows':1}),
           'delivery_date': DateInput(),
           }
-
+    
 # =============================================================================
 # class ItemForm(forms.ModelForm):
 #      class Meta:

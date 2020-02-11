@@ -2,9 +2,53 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from booking.models import Booking
 from .forms import *
+from django.views import generic
+from django.utils import timezone
+from django.db.models import Sum
 
+
+# =============================================================================
+# class BookingIndex(generic.ListView):
+#     model=Booking
+# =============================================================================
 def booking_index(request):
-    bookings = Booking.objects.all()
+    bookings = Booking.objects.all().order_by("-id")[:100]
+    if request.method =="POST": 
+        if request.POST['action'] == 'Deliver':
+            pk = request.POST.get('booking_id')
+            obj = Booking.objects.get(id=pk)
+            obj.delivered = True
+            obj.actual_delivery_date = timezone.now()
+            obj.save()
+            context = {
+            'bookings': bookings
+            }
+            return render(request, 'bookings_index.html', context)
+        elif request.POST['action'] == 'Delete':
+             pk = request.POST.get('booking_id')
+             Booking.objects.filter(id=pk).delete()       
+             bookings = Booking.objects.all().order_by("-id")[:100]
+             context = {
+                 'bookings': bookings
+                 }
+             return render(request, 'bookings_index.html', context)
+        elif request.POST['action'] == 'Filter':
+             start_date = request.POST['start_date']
+             end_date = request.POST['end_date']
+             bookings = Booking.objects.filter(billing_date__range=[start_date, end_date])
+             total = bookings.aggregate(Sum('final_amount'))
+             context = {
+                 'bookings': bookings,
+                 'total' : total
+                 }
+             return render(request, 'bookings_index.html', context)
+        elif request.POST['action'] == 'Show All':
+             bookings = Booking.objects.all().order_by("-id")[:100]
+             context = {
+                 'bookings': bookings
+                 }
+             return render(request, 'bookings_index.html', context) 
+         
     context = {
         'bookings': bookings
     }
@@ -16,6 +60,7 @@ def booking_form(request):
         if form.is_valid(): 
             form.discount = request.POST.get('discount')
             form.final_amount = request.POST.get('final_amount')
+            form.message = request.POST.get('message')
             entry = form.save(commit=False)
             entry.save()
             return redirect('booking_index')

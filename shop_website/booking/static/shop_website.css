@@ -1,1 +1,1 @@
-@media print {  body * {    visibility: hidden;  }  #section-to-print, #section-to-print * {    visibility: visible;  }  #section-to-print {    position: absolute;    left: 0;    top: 0;  }}
+.introduction_in_bill{     display: none;}@media print {    body{        height : 50%;        width : 50%;    }   .introduction_in_bill   {     text-align:center;     display: block;   }   .do_not_print   {   display: none;   }}
